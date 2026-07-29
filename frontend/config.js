@@ -12,5 +12,5 @@
 //   'http://192.168.110.176:8000'
 //
 module.exports = {
-  API_BASE_URL: 'https://api.yourdomain.com'
+  API_BASE_URL: 'https://xiaoyiyicheng-288730-10-1447710501.sh.run.tcloudbase.com'
 };
