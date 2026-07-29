@@ -1,8 +1,7 @@
 """会议记录CRUD路由"""
 import os
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse
-from typing import Optional
 
 from services.storage import (
     create_recording, get_recording, update_recording,
@@ -20,8 +19,9 @@ async def api_list_recordings():
 
 
 @router.post("/api/recordings")
-async def api_create_recording(title: str = Form("")):
+async def api_create_recording(data: dict):
     """创建新会议记录"""
+    title = data.get("title", "")
     return create_recording(title)
 
 
@@ -52,18 +52,21 @@ async def api_delete_recording(recording_id: str):
 
 
 @router.post("/api/recordings/{recording_id}/upload")
-async def api_upload_audio(recording_id: str, file: UploadFile = File(...)):
-    """上传音频文件"""
+async def api_upload_audio(recording_id: str, request: Request, ext: str = ".wav"):
+    """上传音频文件（支持二进制流 / 小程序云托管 callContainer 直传）"""
     rec = get_recording(recording_id)
     if not rec:
         raise HTTPException(status_code=404, detail="会议记录不存在")
 
     # 保存音频文件
     os.makedirs(AUDIO_DIR, exist_ok=True)
-    file_ext = os.path.splitext(file.filename or "audio.wav")[1] or ".wav"
-    audio_path = os.path.join(AUDIO_DIR, f"{recording_id}{file_ext}")
+    ext = ext.strip().lower()
+    if not ext.startswith("."):
+        ext = "." + ext
+    ext = "".join(c for c in ext if c.isalnum() or c == ".") or ".wav"
+    audio_path = os.path.join(AUDIO_DIR, f"{recording_id}{ext}")
 
-    content = await file.read()
+    content = await request.body()
     with open(audio_path, "wb") as f:
         f.write(content)
 

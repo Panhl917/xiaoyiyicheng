@@ -1,4 +1,4 @@
-"""语音转文字路由 - 使用本地Whisper"""
+"""语音转文字路由 - 使用本地 faster-whisper"""
 import os
 from fastapi import APIRouter, HTTPException
 

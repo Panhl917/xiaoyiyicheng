@@ -1,103 +1,126 @@
 /**
  * API 请求工具
- * 封装了与后端的所有交互
+ * 支持两种模式：
+ * 1. 微信云托管内网调用 wx.cloud.callContainer（生产/真机，无需域名备案）
+ * 2. 普通 wx.request HTTP 请求（本地调试）
  */
 
-const getBaseUrl = () => {
-  const app = getApp();
-  return app.globalData.apiBaseUrl || 'http://localhost:8000';
+const config = require('../config.js');
+
+const useCloudCall = () => {
+  if (typeof wx.cloud === 'undefined') return false;
+  return !!config.USE_CLOUD_CALL;
 };
 
-// 通用请求
-const request = (url, method = 'GET', data = null, isForm = false) => {
+/**
+ * 通用请求
+ * @param {string} path 接口路径，如 /api/recordings
+ * @param {string} method HTTP 方法
+ * @param {object|ArrayBuffer|string} data 请求体
+ * @param {object} options 额外选项 { header, dataType }
+ */
+const request = (path, method = 'GET', data = null, options = {}) => {
   return new Promise((resolve, reject) => {
-    const header = {};
-    if (method === 'POST' && !isForm) {
-      header['Content-Type'] = 'application/json';
+    const header = options.header || {};
+
+    if (useCloudCall()) {
+      wx.cloud.callContainer({
+        config: { env: config.CLOUD_ENV },
+        path,
+        method,
+        data,
+        header: {
+          'X-WX-SERVICE': config.CLOUD_SERVICE,
+          ...header,
+        },
+        dataType: options.dataType || 'json',
+        success: (res) => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data);
+          } else {
+            reject(new Error((res.data && res.data.detail) || `请求失败: ${res.statusCode}`));
+          }
+        },
+        fail: (err) => reject(new Error(err.errMsg || '云托管调用失败')),
+      });
+    } else {
+      // 本地调试 / 自定义域名模式
+      if (method === 'POST' && data && !(data instanceof ArrayBuffer)) {
+        header['Content-Type'] = header['Content-Type'] || 'application/json';
+      }
+      wx.request({
+        url: `${config.API_BASE_URL}${path}`,
+        method,
+        data,
+        header,
+        success: (res) => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(res.data);
+          } else {
+            reject(new Error(res.data?.detail || `请求失败: ${res.statusCode}`));
+          }
+        },
+        fail: (err) => reject(new Error('网络请求失败')),
+      });
     }
-    wx.request({
-      url: `${getBaseUrl()}${url}`,
-      method,
-      data,
-      header,
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else {
-          reject(new Error(res.data?.detail || `请求失败: ${res.statusCode}`));
-        }
-      },
-      fail: (err) => {
-        reject(new Error('网络请求失败，请检查后端服务是否启动'));
-      },
-    });
   });
 };
 
-// 上传文件
-const uploadFile = (url, filePath, formData = {}) => {
+/**
+ * 上传音频文件（读取本地文件为 ArrayBuffer 后 POST）
+ * 兼容 wx.cloud.callContainer 和 wx.request
+ */
+const uploadAudio = (id, filePath) => {
   return new Promise((resolve, reject) => {
-    wx.uploadFile({
-      url: `${getBaseUrl()}${url}`,
+    const fs = wx.getFileSystemManager();
+    fs.readFile({
       filePath,
-      name: 'file',
-      formData,
-      success: (res) => {
-        try {
-          resolve(JSON.parse(res.data));
-        } catch {
-          resolve(res.data);
-        }
+      success: (readRes) => {
+        const buffer = readRes.data;
+        const extMatch = filePath.match(/\.([a-zA-Z0-9]+)$/);
+        const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.wav';
+        const contentType = ext === '.wav' ? 'audio/wav'
+          : ext === '.mp3' ? 'audio/mpeg'
+          : ext === '.m4a' ? 'audio/mp4'
+          : ext === '.aac' ? 'audio/aac'
+          : 'application/octet-stream';
+
+        request(
+          `/api/recordings/${id}/upload?ext=${encodeURIComponent(ext)}`,
+          'POST',
+          buffer,
+          { header: { 'Content-Type': contentType } }
+        )
+          .then(resolve)
+          .catch(reject);
       },
-      fail: (err) => reject(err),
+      fail: (err) => reject(new Error('读取音频文件失败: ' + err.errMsg)),
     });
   });
 };
 
 // ===== 会议记录 API =====
 
-// 获取会议列表
 const getRecordings = () => request('/api/recordings');
 
-// 创建会议
-const createRecording = (title = '') => {
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: `${getBaseUrl()}/api/recordings`,
-      method: 'POST',
-      header: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      data: { title },
-      success: (res) => resolve(res.data),
-      fail: reject,
-    });
-  });
-};
+const createRecording = (title = '') => request('/api/recordings', 'POST', { title });
 
-// 获取会议详情
 const getRecording = (id) => request(`/api/recordings/${id}`);
 
-// 更新会议
 const updateRecording = (id, data) => request(`/api/recordings/${id}`, 'PUT', data);
 
-// 删除会议
 const deleteRecording = (id) => request(`/api/recordings/${id}`, 'DELETE');
 
-// 上传音频
-const uploadAudio = (id, filePath) => uploadFile(`/api/recordings/${id}/upload`, filePath);
-
-// 语音转文字
 const transcribe = (id) => request(`/api/recordings/${id}/transcribe`, 'POST');
 
-// 生成摘要
 const summarize = (id) => request(`/api/recordings/${id}/summarize`, 'POST');
 
-// 生成思维导图
 const generateMindmap = (id) => request(`/api/recordings/${id}/mindmap`, 'POST');
 
-// 生成知识图谱
 const generateKnowledgeGraph = (id) => request(`/api/recordings/${id}/knowledge-graph`, 'POST');
 
 module.exports = {
+  request,
   getRecordings,
   createRecording,
   getRecording,

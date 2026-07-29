@@ -1,8 +1,13 @@
 const config = require('./config.js');
+const api = require('./utils/api.js');
 
 App({
   onLaunch() {
-    // 检查后端配置（域名在 config.js 中设置）
+    // 初始化云托管调用环境（必须，否则 wx.cloud.callContainer 不可用）
+    if (config.USE_CLOUD_CALL && typeof wx.cloud !== 'undefined') {
+      wx.cloud.init();
+    }
+
     this.globalData = {
       apiBaseUrl: config.API_BASE_URL,
     };
@@ -12,40 +17,19 @@ App({
   },
 
   checkConnection() {
-    const { apiBaseUrl } = this.globalData;
-    wx.request({
-      url: `${apiBaseUrl}/api/health`,
-      method: 'GET',
-      success: (res) => {
-        console.log('[连接成功] 后端服务已连接:', res.data);
+    api.request('/api/health')
+      .then((res) => {
+        console.log('[连接成功] 后端服务已连接:', res);
         this.globalData.connected = true;
-      },
-      fail: (err) => {
+      })
+      .catch((err) => {
         console.warn('[连接失败]', err);
         this.globalData.connected = false;
         wx.showModal({
           title: '连接后端失败',
-          content: '请确认：\n1. 后端已启动: cd D:\\meeting-mini-app\\backend && python main.py\n2. 项目设置→本地设置→勾选"不校验合法域名"',
+          content: '请确认：\n1. 云托管服务已启动\n2. 本地调试时 USE_CLOUD_CALL 设为 false 且后端已启动',
           showCancel: false,
         });
-      }
-    });
-  },
-
-  // 全局请求方法
-  request(url, method = 'GET', data = null) {
-    return new Promise((resolve, reject) => {
-      const { apiBaseUrl } = this.globalData;
-      wx.request({
-        url: `${apiBaseUrl}${url}`,
-        method,
-        data,
-        header: method === 'POST' && !(data instanceof ArrayBuffer)
-          ? { 'Content-Type': 'application/json' }
-          : {},
-        success: (res) => resolve(res.data),
-        fail: (err) => reject(err),
       });
-    });
   },
 });
