@@ -14,6 +14,10 @@ WORKDIR /app
 # 用 --no-build-isolation 让 whisper 复用下面这个版本的 setuptools 来构建。
 RUN pip install --no-cache-dir --upgrade "pip" "setuptools==80.9.0" "wheel"
 
+# 先装 CPU 版 torch（容器无 GPU），避免拉取庞大的 CUDA 版：
+# 大幅减小镜像体积、加快构建、并防止构建机内存不足(OOM)导致失败
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
 # 先装依赖，利用 Docker 构建缓存
 COPY requirements.txt .
 RUN pip install --no-cache-dir --no-build-isolation -r requirements.txt
