@@ -38,16 +38,21 @@ def _call_deepseek(system_prompt: str, user_prompt: str, temperature: float = 0.
 # ========== 语音转文字 (本地Whisper) ==========
 
 def transcribe_audio(audio_path: str) -> Optional[str]:
-    """使用本地Whisper模型将音频转为文字（完全免费）"""
+    """使用本地 faster-whisper 模型将音频转为文字（完全免费，不依赖 torch）"""
     try:
-        import whisper
+        from faster_whisper import WhisperModel
         print(f"[Whisper] 加载模型: {config.WHISPER_MODEL_SIZE}")
-        model = whisper.load_model(config.WHISPER_MODEL_SIZE)
+        # 云托管容器无 GPU，统一用 CPU + int8 量化，省内存且更快
+        model = WhisperModel(
+            config.WHISPER_MODEL_SIZE,
+            device="cpu",
+            compute_type="int8",
+        )
         print(f"[Whisper] 开始转写: {audio_path}")
-        result = model.transcribe(audio_path, language="zh")
-        return result["text"]
+        segments, _ = model.transcribe(audio_path, language="zh", beam_size=5)
+        return "".join(seg.text for seg in segments)
     except ImportError:
-        print("[Whisper] whisper未安装，尝试直接调用whisper命令行...")
+        print("[Whisper] faster-whisper 未安装")
         return None
     except Exception as e:
         print(f"[Whisper Error] {e}")

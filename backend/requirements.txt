@@ -1,9 +1,7 @@
 fastapi==0.110.2
 uvicorn==0.29.0
 python-multipart==0.0.9
-openai-whisper==20240930
+faster-whisper
 openai==1.98.0
 pydantic==2.7.0
 python-dotenv==1.0.1
-# whisper 依赖 numba，numba 不兼容 numpy 2，固定 1.x 避免运行时崩溃
-numpy==1.26.4
