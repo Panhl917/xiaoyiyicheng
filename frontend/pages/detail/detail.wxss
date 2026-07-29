@@ -1,0 +1,262 @@
+/* 详情页样式 */
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F4F6FB;
+}
+
+.content-scroll {
+  flex: 1;
+  padding-bottom: 140rpx;
+}
+
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.title-left {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-hint {
+  font-size: 22rpx;
+  color: #B6BDCC;
+  margin-left: 12rpx;
+}
+
+/* 复制按钮（圆形图标） */
+.copy-btn {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #F0F4FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.copy-btn:active {
+  background: #E2EAF8;
+  transform: scale(0.92);
+}
+
+.copy-btn text {
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+/* 复制全部（胶囊按钮） */
+.copy-all-btn {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  padding: 12rpx 22rpx;
+  border-radius: 30rpx;
+  background: #EAF1FF;
+  color: #3D7EFF;
+  font-size: 23rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.copy-all-btn:active {
+  background: #DCE8FF;
+  transform: scale(0.96);
+}
+
+/* 标题多行 */
+.title-textarea {
+  min-height: 88rpx;
+  line-height: 1.55;
+}
+
+/* 操作按钮网格 */
+.action-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 8rpx 20rpx 16rpx;
+}
+
+.action-btn {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 20rpx;
+  flex: 1;
+  min-width: 140rpx;
+  text-align: center;
+  box-shadow: 0 6rpx 18rpx rgba(31, 77, 168, 0.06);
+  border: 1rpx solid rgba(238, 241, 247, 0.9);
+  transition: transform 0.2s;
+}
+
+.action-btn:active {
+  transform: scale(0.96);
+}
+
+.action-btn-icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14rpx;
+  font-size: 40rpx;
+}
+
+.action-btn-icon text { font-size: 40rpx; line-height: 1; }
+
+.icon-blue   { background: linear-gradient(135deg, #EAF1FF, #DCE8FF); }
+.icon-green  { background: linear-gradient(135deg, #E7F8EE, #D6F2E2); }
+.icon-purple { background: linear-gradient(135deg, #F1ECFF, #E4DAFF); }
+.icon-orange { background: linear-gradient(135deg, #FFF3E0, #FFE6C4); }
+
+.action-btn-text {
+  font-size: 23rpx;
+  color: #4A5468;
+  font-weight: 500;
+}
+
+/* 关键要点 */
+.key-points-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.key-point-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+}
+
+.point-num {
+  font-size: 28rpx;
+  color: #3D7EFF;
+  font-weight: 700;
+  width: 42rpx;
+  flex-shrink: 0;
+  line-height: 1.6;
+  margin-top: 18rpx;
+}
+
+.point-textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 80rpx;
+  padding: 16rpx 20rpx;
+  background: #F8FAFD;
+  border-radius: 14rpx;
+  border: 2rpx solid #E6EAF2;
+  font-size: 27rpx;
+  line-height: 1.55;
+  color: #1E2A3A;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.point-textarea:focus {
+  border-color: #3D7EFF;
+  background: #fff;
+}
+
+/* 原文稿 / 摘要：固定高度，内容过长时内部滚动 */
+.textarea-field {
+  border: 2rpx solid #E6EAF2;
+  border-radius: 16rpx;
+  padding: 22rpx 24rpx;
+  font-size: 27rpx;
+  line-height: 1.6;
+  background: #F8FAFD;
+  width: 100%;
+  color: #1E2A3A;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.textarea-field:focus {
+  border-color: #3D7EFF;
+  background: #fff;
+}
+
+/* 录音播放器 */
+.audio-card {
+  padding: 24rpx 28rpx;
+}
+
+.audio-row {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+}
+
+.audio-play {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3D7EFF, #2B5FD9);
+  color: #fff;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8rpx 20rpx rgba(61, 126, 255, 0.32);
+}
+
+.audio-play:active {
+  opacity: 0.85;
+  transform: scale(0.96);
+}
+
+.audio-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.audio-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2B3A4F;
+  display: block;
+  margin-bottom: 14rpx;
+}
+
+.audio-progress {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.audio-bar {
+  flex: 1;
+  height: 8rpx;
+  background: #E6EAF2;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.audio-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3D7EFF, #2B5FD9);
+  border-radius: 8rpx;
+  transition: width 0.25s linear;
+}
+
+.audio-time {
+  font-size: 22rpx;
+  color: #9AA3B5;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}

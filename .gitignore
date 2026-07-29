@@ -1,0 +1,17 @@
+# ===== 后端 =====
+backend/.env
+backend/.env.example
+backend/data/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+
+# ===== 前端 =====
+frontend/project.private.config.json
+
+# ===== 通用 =====
+.DS_Store
+.git/
+node_modules/
+__pycache__/

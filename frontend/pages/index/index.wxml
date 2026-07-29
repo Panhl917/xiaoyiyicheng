@@ -1,0 +1,74 @@
+<!-- 首页 - 会议列表 -->
+<view class="page-container">
+  <!-- 头部 -->
+  <view class="header">
+    <text class="header-title">小议议程</text>
+    <text class="header-subtitle">智能录音 · 自动总结 · 思维导图 · 知识图谱</text>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goToRecord">
+      <view class="action-icon record-icon">🎙</view>
+      <text class="action-label">新建录音</text>
+    </view>
+    <view class="action-item" bindtap="goToRecord">
+      <view class="action-icon upload-icon">📁</view>
+      <text class="action-label">上传音频</text>
+    </view>
+  </view>
+
+  <!-- 会议列表标题 -->
+  <view class="section-header">
+    <text class="section-title">历史会议</text>
+    <text class="section-count" wx:if="{{recordings.length}}">共 {{recordings.length}} 条</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <loading>加载中...</loading>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:elif="{{recordings.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <text class="empty-text">还没有会议记录</text>
+    <text class="empty-subtext">点击上方按钮开始记录你的会议</text>
+  </view>
+
+  <!-- 会议列表 -->
+  <scroll-view
+    wx:elif="{{recordings.length > 0}}"
+    class="recording-list"
+    scroll-y
+    bindscrolltolower="loadMore"
+  >
+    <view
+      class="recording-item"
+      wx:for="{{recordings}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="item-header">
+        <text class="item-title">{{item.title}}</text>
+        <text class="item-status status-{{item.status}}">
+          {{statusText[item.status]}}
+        </text>
+      </view>
+      <view class="item-meta">
+        <text class="item-date">{{formatDate(item.created_at)}}</text>
+        <text class="item-summary-preview" wx:if="{{item.summary}}">
+          {{item.summary.slice(0, 40)}}...
+        </text>
+      </view>
+      <view class="item-tags" wx:if="{{item.summary}}">
+        <text class="tag tag-blue">已总结</text>
+        <text class="tag tag-green" wx:if="{{item.mindmap_data}}">思维导图</text>
+        <text class="tag tag-orange" wx:if="{{item.knowledge_graph_data}}">知识图谱</text>
+      </view>
+      <!-- 删除按钮 -->
+      <view class="delete-btn" bindtap="deleteRecording" data-id="{{item.id}}">删除</view>
+    </view>
+  </scroll-view>
+</view>

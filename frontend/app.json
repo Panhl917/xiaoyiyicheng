@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/record/record",
+    "pages/detail/detail",
+    "pages/mindmap/mindmap",
+    "pages/knowledge/knowledge"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#3D7EFF",
+    "navigationBarTitleText": "小议议程",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F4F6FB",
+    "backgroundTextStyle": "dark"
+  },
+  "usingComponents": {
+    "mindmap-canvas": "/components/mindmap-canvas/mindmap-canvas",
+    "graph-canvas": "/components/graph-canvas/graph-canvas"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

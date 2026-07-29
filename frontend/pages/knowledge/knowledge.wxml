@@ -1,0 +1,27 @@
+<!-- 知识图谱页 -->
+<view class="page">
+  <view class="page-header">
+    <text class="page-title">🔗 知识图谱</text>
+    <text class="page-subtitle">点击节点编辑 · 拖拽移动 · 长按添加 · 双指缩放</text>
+  </view>
+
+  <view class="canvas-wrapper">
+    <graph-canvas
+      wx:if="{{graphData}}"
+      graphData="{{graphData}}"
+      bind:change="onGraphChange"
+    />
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">🔗</text>
+      <text class="empty-text">暂无知识图谱</text>
+      <text class="empty-subtext">在会议详情页点击"知识图谱"生成</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="action-bar-inner">
+      <view class="action-btn primary" bindtap="saveGraph">💾 保存</view>
+      <view class="action-btn secondary" bindtap="regenerate">🔄 重新生成</view>
+    </view>
+  </view>
+</view>

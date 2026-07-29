@@ -1,0 +1,27 @@
+<!-- 思维导图页 -->
+<view class="page">
+  <view class="page-header">
+    <text class="page-title">🧠 思维导图</text>
+    <text class="page-subtitle">点击节点编辑 · 拖拽移动 · 双指缩放</text>
+  </view>
+
+  <view class="canvas-wrapper">
+    <mindmap-canvas
+      wx:if="{{mindmapData}}"
+      mindmapData="{{mindmapData}}"
+      bind:change="onMindmapChange"
+    />
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">🧠</text>
+      <text class="empty-text">暂无思维导图</text>
+      <text class="empty-subtext">在会议详情页点击"思维导图"生成</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="action-bar-inner">
+      <view class="action-btn primary" bindtap="saveMindmap">💾 保存</view>
+      <view class="action-btn secondary" bindtap="regenerate">🔄 重新生成</view>
+    </view>
+  </view>
+</view>

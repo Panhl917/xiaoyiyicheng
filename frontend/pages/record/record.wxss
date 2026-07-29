@@ -1,0 +1,219 @@
+/* 录音页样式 */
+.page-container {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 页面头部 */
+.page-header {
+  background: linear-gradient(135deg, #3D7EFF, #2B5FD9);
+  padding: 48rpx 36rpx 64rpx;
+  border-radius: 0 0 44rpx 44rpx;
+  box-shadow: 0 8rpx 24rpx rgba(43, 95, 217, 0.18);
+}
+
+.ph-title {
+  color: #fff;
+  font-size: 42rpx;
+  font-weight: 700;
+  display: block;
+}
+
+.ph-sub {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 24rpx;
+  margin-top: 10rpx;
+  display: block;
+}
+
+.field-label {
+  font-size: 26rpx;
+  color: #6B7585;
+  display: block;
+  margin-bottom: 14rpx;
+  font-weight: 600;
+}
+
+/* 模式切换 */
+.mode-tabs {
+  display: flex;
+  background: #EEF1F7;
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 30rpx;
+}
+
+.mode-tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 27rpx;
+  border-radius: 12rpx;
+  color: #6B7585;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.mode-tab.active {
+  background: #fff;
+  color: #3D7EFF;
+  font-weight: 700;
+  box-shadow: 0 4rpx 12rpx rgba(31, 77, 168, 0.10);
+}
+
+/* 录音区域 */
+.record-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.record-button {
+  width: 184rpx;
+  height: 184rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3D7EFF, #2B5FD9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 36rpx rgba(61, 126, 255, 0.35);
+  transition: all 0.3s;
+}
+
+.record-button.recording {
+  background: linear-gradient(135deg, #FF6B6B, #E84848);
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 12rpx 36rpx rgba(255, 91, 91, 0.35);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.record-icon {
+  font-size: 64rpx;
+  color: #fff;
+}
+
+.record-hint {
+  font-size: 26rpx;
+  color: #9AA3B5;
+  margin-top: 24rpx;
+}
+
+.record-timer {
+  font-size: 48rpx;
+  color: #FF5B5B;
+  font-weight: 600;
+  margin-top: 12rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 上传区域 */
+.upload-section {
+  padding: 20rpx 0;
+}
+
+.upload-area {
+  border: 4rpx dashed #D6DCE8;
+  border-radius: 20rpx;
+  padding: 64rpx 40rpx;
+  text-align: center;
+  background: #FAFBFE;
+  transition: all 0.3s;
+}
+
+.upload-area:active {
+  border-color: #3D7EFF;
+  background: #EEF3FF;
+}
+
+.upload-icon {
+  font-size: 64rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #9AA3B5;
+  display: block;
+}
+
+.upload-text.selected {
+  color: #1E2A3A;
+  font-weight: 600;
+}
+
+.upload-hint {
+  font-size: 22rpx;
+  color: #B6BDCC;
+  display: block;
+  margin-top: 12rpx;
+}
+
+/* 处理进度 */
+.process-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 28rpx;
+}
+
+.process-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  flex: 1;
+  position: relative;
+}
+
+.process-step::after {
+  content: '';
+  position: absolute;
+  top: 30rpx;
+  left: 60%;
+  width: 80%;
+  height: 2rpx;
+  background: #EEF1F7;
+}
+
+.process-step:last-child::after { display: none; }
+
+.step-icon {
+  font-size: 36rpx;
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  border-radius: 50%;
+  background: #F0F2F7;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.process-step.done .step-icon {
+  background: #E7F8EE;
+}
+
+.step-text {
+  font-size: 20rpx;
+  color: #9AA3B5;
+}
+
+.process-step.done .step-text {
+  color: #1FA862;
+  font-weight: 600;
+}
+
+/* 提交区域 */
+.submit-area {
+  padding: 20rpx;
+  margin-top: 20rpx;
+}
+
+.submit-area button {
+  width: 100%;
+}

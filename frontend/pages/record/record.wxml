@@ -1,0 +1,88 @@
+<!-- 录音页 -->
+<view class="page-container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="ph-title">新建会议</text>
+    <text class="ph-sub">录音或上传音频，自动转写与总结</text>
+  </view>
+
+  <!-- 标题输入 -->
+  <view class="card">
+    <text class="field-label">会议主题</text>
+    <input
+      class="input-field"
+      placeholder="输入会议主题（可选）"
+      value="{{title}}"
+      bindinput="onTitleInput"
+    />
+  </view>
+
+  <!-- 录音模式选择 -->
+  <view class="card">
+    <view class="mode-tabs">
+      <view
+        class="mode-tab {{recordMode === 'record' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="record"
+      >
+        🎙 实时录音
+      </view>
+      <view
+        class="mode-tab {{recordMode === 'upload' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="upload"
+      >
+        📁 上传音频
+      </view>
+    </view>
+
+    <!-- 实时录音模式 -->
+    <view class="record-section" wx:if="{{recordMode === 'record'}}">
+      <view class="record-button {{isRecording ? 'recording' : ''}}" bindtap="toggleRecord">
+        <text class="record-icon">{{isRecording ? '⏹' : '🎙'}}</text>
+      </view>
+      <text class="record-hint">{{isRecording ? '点击停止录音' : '点击开始录音'}}</text>
+      <text class="record-timer" wx:if="{{isRecording}}">{{formatTime(recordTime)}}</text>
+    </view>
+
+    <!-- 上传模式 -->
+    <view class="upload-section" wx:elif="{{recordMode === 'upload'}}">
+      <view class="upload-area" bindtap="chooseAudio">
+        <text class="upload-icon">📂</text>
+        <text class="upload-text" wx:if="{{!audioFile}}">点击选择音频文件</text>
+        <text class="upload-text selected" wx:if="{{audioFile}}">{{audioFileName}}</text>
+        <text class="upload-hint">支持 MP3、WAV、M4A 格式</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 处理进度 -->
+  <view class="card" wx:if="{{processing}}">
+    <view class="process-steps">
+      <view class="process-step {{processStep >= 1 ? 'done' : ''}}">
+        <text class="step-icon">{{processStep >= 1 ? '✅' : '⏳'}}</text>
+        <text class="step-text">创建记录</text>
+      </view>
+      <view class="process-step {{processStep >= 2 ? 'done' : ''}}">
+        <text class="step-icon">{{processStep >= 2 ? '✅' : '⏳'}}</text>
+        <text class="step-text">处理音频</text>
+      </view>
+      <view class="process-step {{processStep >= 3 ? 'done' : ''}}">
+        <text class="step-icon">{{processStep >= 3 ? '✅' : '⏳'}}</text>
+        <text class="step-text">识别文字</text>
+      </view>
+      <view class="process-step {{processStep >= 4 ? 'done' : ''}}">
+        <text class="step-icon">{{processStep >= 4 ? '✅' : '⏳'}}</text>
+        <text class="step-text">生成摘要</text>
+      </view>
+    </view>
+    <progress percent="{{processPercent}}" stroke-width="6" activeColor="#3D7EFF" />
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-area" wx:if="{{!processing}}">
+    <button class="btn-primary" bindtap="submitAndProcess" disabled="{{!canSubmit}}">
+      {{recordMode === 'record' ? '录音并处理' : '上传并处理'}}
+    </button>
+  </view>
+</view>

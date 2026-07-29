@@ -1,0 +1,12 @@
+# 不进入镜像的文件
+.env
+.env.example
+data/
+__pycache__/
+*.pyc
+*.pyo
+.git
+.gitignore
+README.md
+container.config.json
+.DS_Store

@@ -1,0 +1,212 @@
+/**app.wxss**/
+
+/* ===== 设计变量(现代精致蓝) ===== */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', sans-serif;
+  background-color: #F4F6FB;
+  color: #1E2A3A;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+view, text, input, textarea, button { box-sizing: border-box; }
+
+/* ===== 卡片容器 ===== */
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(31, 77, 168, 0.06);
+  border: 1rpx solid rgba(238, 241, 247, 0.9);
+}
+
+/* ===== 主按钮 ===== */
+.btn-primary {
+  background: linear-gradient(135deg, #3D7EFF, #2B5FD9);
+  color: #fff;
+  border: none;
+  border-radius: 50rpx;
+  padding: 24rpx 48rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8rpx 20rpx rgba(61, 126, 255, 0.32);
+  line-height: 1.4;
+}
+
+.btn-primary:active {
+  opacity: 0.88;
+  transform: translateY(1rpx);
+}
+
+/* ===== 次要按钮 ===== */
+.btn-secondary {
+  background: #fff;
+  color: #3D7EFF;
+  border: 2rpx solid #3D7EFF;
+  border-radius: 50rpx;
+  padding: 20rpx 40rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.btn-secondary:active {
+  background: #EEF3FF;
+}
+
+/* ===== 危险操作按钮 ===== */
+.btn-danger {
+  background: #fff;
+  color: #FF5B5B;
+  border: 2rpx solid #FF5B5B;
+  border-radius: 50rpx;
+  padding: 16rpx 32rpx;
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.btn-danger:active { background: #FFF0F0; }
+
+/* ===== 输入框 ===== */
+.input-field {
+  border: 2rpx solid #E6EAF2;
+  border-radius: 16rpx;
+  padding: 22rpx 24rpx;
+  font-size: 28rpx;
+  background: #F8FAFD;
+  width: 100%;
+  color: #1E2A3A;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.input-field:focus {
+  border-color: #3D7EFF;
+  background: #fff;
+}
+
+/* ===== 文本区域 ===== */
+.textarea-field {
+  border: 2rpx solid #E6EAF2;
+  border-radius: 16rpx;
+  padding: 22rpx 24rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  background: #F8FAFD;
+  width: 100%;
+  min-height: 200rpx;
+  color: #1E2A3A;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.textarea-field:focus {
+  border-color: #3D7EFF;
+  background: #fff;
+}
+
+/* ===== 标签 ===== */
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+  font-size: 22rpx;
+  margin: 6rpx;
+  font-weight: 500;
+}
+
+.tag-blue   { background: #EAF1FF; color: #3D7EFF; }
+.tag-green  { background: #E7F8EE; color: #1FA862; }
+.tag-orange { background: #FFF3E0; color: #E8912D; }
+.tag-red    { background: #FFEDED; color: #FF5B5B; }
+
+/* ===== 空状态 ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+  color: #9AA3B5;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.85;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #9AA3B5;
+}
+
+.empty-subtext {
+  font-size: 24rpx;
+  color: #B6BDCC;
+  margin-top: 8rpx;
+}
+
+/* ===== 加载动画 ===== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx;
+}
+
+/* ===== 页面标题 ===== */
+.page-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1E2A3A;
+  padding: 30rpx 30rpx 20rpx;
+}
+
+/* ===== 分割线 ===== */
+.divider {
+  height: 2rpx;
+  background: #EEF1F7;
+  margin: 20rpx 0;
+}
+
+/* ===== 页面统一头部 ===== */
+.page-header {
+  background: linear-gradient(135deg, #3D7EFF, #2B5FD9);
+  padding: 48rpx 36rpx 64rpx;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.page-header .ph-title {
+  color: #fff;
+  font-size: 44rpx;
+  font-weight: 700;
+  display: block;
+}
+
+.page-header .ph-sub {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 24rpx;
+  margin-top: 10rpx;
+  display: block;
+}
+
+/* ===== 底部操作栏 ===== */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10rpx);
+  padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -6rpx 20rpx rgba(31, 77, 168, 0.06);
+  display: flex;
+  gap: 20rpx;
+  z-index: 100;
+  border-top: 1rpx solid #EEF1F7;
+}
+
+.action-bar .btn-primary,
+.action-bar .btn-secondary { flex: 1; }

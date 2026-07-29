@@ -1,0 +1,16 @@
+{
+  "containerPort": 8000,
+  "cpu": 1,
+  "mem": 2,
+  "minNum": 0,
+  "maxNum": 5,
+  "concurrency": 1,
+  "dockerfilePath": "Dockerfile",
+  "buildDir": ".",
+  "env": [
+    {
+      "key": "WHISPER_MODEL_SIZE",
+      "value": "base"
+    }
+  ]
+}
