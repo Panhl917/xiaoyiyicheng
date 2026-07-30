@@ -3,6 +3,9 @@ FROM python:3.11-slim
 
 # 使用国内 HuggingFace 镜像，避免运行时访问 huggingface.co 被墙（Network is unreachable）
 ENV HF_ENDPOINT=https://hf-mirror.com
+# 禁用 Xet 分布式存储（镜像对其 CAS 接口返回 401），改走传统文件下载
+ENV HF_HUB_DISABLE_XET=1
+ENV HF_HUB_ENABLE_HF_TRANSFER=0
 ENV HF_HOME=/root/.cache/huggingface
 
 # Whisper 需要 ffmpeg 做音频解码；curl 用于健康检查
