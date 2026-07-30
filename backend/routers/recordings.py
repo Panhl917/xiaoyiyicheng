@@ -1,5 +1,6 @@
 """会议记录CRUD路由"""
 import os
+import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse
 
@@ -72,6 +73,42 @@ async def api_upload_audio(recording_id: str, request: Request, ext: str = ".aac
 
     with open(audio_path, "wb") as f:
         f.write(content)
+
+    update_recording(recording_id, {
+        "audio_file": audio_path,
+        "status": "uploaded"
+    })
+
+    return {"message": "上传成功", "audio_path": audio_path}
+
+
+@router.post("/api/recordings/{recording_id}/upload-url")
+async def api_upload_audio_url(recording_id: str, data: dict):
+    """接收云存储临时下载 URL，后端下载音频文件到本地"""
+    rec = get_recording(recording_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="会议记录不存在")
+
+    url = data.get("url", "")
+    ext = data.get("ext", ".aac")
+    if not url:
+        raise HTTPException(status_code=400, detail="缺少音频下载链接")
+
+    os.makedirs(AUDIO_DIR, exist_ok=True)
+    ext = ext.strip().lower()
+    if not ext.startswith("."):
+        ext = "." + ext
+    ext = "".join(c for c in ext if c.isalnum() or c == ".") or ".aac"
+    audio_path = os.path.join(AUDIO_DIR, f"{recording_id}{ext}")
+
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, timeout=30.0)
+            resp.raise_for_status()
+            with open(audio_path, "wb") as f:
+                f.write(resp.content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"下载音频失败: {e}")
 
     update_recording(recording_id, {
         "audio_file": audio_path,

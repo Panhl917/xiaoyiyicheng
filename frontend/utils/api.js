@@ -67,34 +67,32 @@ const request = (path, method = 'GET', data = null, options = {}) => {
 };
 
 /**
- * 上传音频文件（以 ArrayBuffer 二进制直传）
- * 兼容 wx.cloud.callContainer 和 wx.request，不手动设置 Content-Type，避免序列化冲突
+ * 上传音频文件
+ * 先上传到微信云存储，再把临时下载 URL 传给后端，避免 callContainer 100KB 请求体限制
  */
 const uploadAudio = (id, filePath) => {
   return new Promise((resolve, reject) => {
-    const fs = wx.getFileSystemManager();
-    fs.readFile({
+    const extMatch = filePath.match(/\.([a-zA-Z0-9]+)$/);
+    const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.aac';
+    const cloudPath = `recordings/${id}${ext}`;
+
+    wx.cloud.uploadFile({
+      cloudPath,
       filePath,
-      success: (readRes) => {
-        const buffer = readRes.data;
-        if (!buffer || (buffer.byteLength !== undefined && buffer.byteLength === 0)) {
-          reject(new Error('音频文件为空'));
-          return;
-        }
-
-        const extMatch = filePath.match(/\.([a-zA-Z0-9]+)$/);
-        const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.aac';
-
-        request(
-          `/api/recordings/${id}/upload?ext=${encodeURIComponent(ext)}`,
-          'POST',
-          buffer,
-          { dataType: 'json' }
-        )
-          .then(resolve)
-          .catch(reject);
+      success: (uploadRes) => {
+        const fileID = uploadRes.fileID;
+        wx.cloud.getTempFileURL({
+          fileList: [fileID],
+          success: (urlRes) => {
+            const tempFileURL = urlRes.fileList[0].tempFileURL;
+            request(`/api/recordings/${id}/upload-url`, 'POST', { url: tempFileURL, ext })
+              .then(resolve)
+              .catch(reject);
+          },
+          fail: (err) => reject(new Error('获取音频下载链接失败: ' + err.errMsg)),
+        });
       },
-      fail: (err) => reject(new Error('读取音频文件失败: ' + err.errMsg)),
+      fail: (err) => reject(new Error('上传音频到云存储失败: ' + err.errMsg)),
     });
   });
 };
