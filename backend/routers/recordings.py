@@ -1,6 +1,7 @@
 """会议记录CRUD路由"""
+import base64
 import os
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from services.storage import (
@@ -52,8 +53,8 @@ async def api_delete_recording(recording_id: str):
 
 
 @router.post("/api/recordings/{recording_id}/upload")
-async def api_upload_audio(recording_id: str, request: Request, ext: str = ".wav"):
-    """上传音频文件（支持二进制流 / 小程序云托管 callContainer 直传）"""
+async def api_upload_audio(recording_id: str, data: dict, ext: str = ".wav"):
+    """上传音频文件（接收 JSON 里的 base64 音频，兼容 wx.cloud.callContainer）"""
     rec = get_recording(recording_id)
     if not rec:
         raise HTTPException(status_code=404, detail="会议记录不存在")
@@ -66,7 +67,15 @@ async def api_upload_audio(recording_id: str, request: Request, ext: str = ".wav
     ext = "".join(c for c in ext if c.isalnum() or c == ".") or ".wav"
     audio_path = os.path.join(AUDIO_DIR, f"{recording_id}{ext}")
 
-    content = await request.body()
+    audio_b64 = data.get("audio", "")
+    if not audio_b64:
+        raise HTTPException(status_code=400, detail="缺少音频数据")
+
+    try:
+        content = base64.b64decode(audio_b64)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"音频数据解码失败: {e}")
+
     with open(audio_path, "wb") as f:
         f.write(content)
 

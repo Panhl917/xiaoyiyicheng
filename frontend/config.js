@@ -14,9 +14,9 @@ module.exports = {
   // true：走云托管内网调用（生产/真机推荐）；false：走普通 HTTP 请求（本地调试）
   USE_CLOUD_CALL: true,
   // 微信云托管环境 ID（在云托管控制台左上角复制）
-  CLOUD_ENV: 'cloud1-d4gdge5501a28b9cc',
+  CLOUD_ENV: 'prod-d1gtuikq0e55a4f4e',
   // 微信云托管服务名称
-  CLOUD_SERVICE: 'xiaoyiyicheng',
+  CLOUD_SERVICE: 'flask-ozmc',
   // 普通 HTTP 模式用的后端地址（本地调试 / 自定义域名时使用）
-  API_BASE_URL: 'https://xiaoyiyicheng-288730-10-1447710501.sh.run.tcloudbase.com'
+  API_BASE_URL: 'https://flask-ozmc-288882-10-1460163005.sh.run.tcloudbase.com'
 };
