@@ -85,7 +85,7 @@ const uploadAudio = (id, filePath) => {
           fileList: [fileID],
           success: (urlRes) => {
             const tempFileURL = urlRes.fileList[0].tempFileURL;
-            request(`/api/recordings/${id}/upload-url`, 'POST', { url: tempFileURL, ext })
+            request(`/api/recordings/${id}/upload-url`, 'POST', { url: tempFileURL, fileID, ext })
               .then(resolve)
               .catch(reject);
           },

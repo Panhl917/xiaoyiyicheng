@@ -90,6 +90,7 @@ async def api_upload_audio_url(recording_id: str, data: dict):
         raise HTTPException(status_code=404, detail="会议记录不存在")
 
     url = data.get("url", "")
+    file_id = data.get("fileID", "") or data.get("file_id", "")
     ext = data.get("ext", ".aac")
     if not url:
         raise HTTPException(status_code=400, detail="缺少音频下载链接")
@@ -112,6 +113,7 @@ async def api_upload_audio_url(recording_id: str, data: dict):
 
     update_recording(recording_id, {
         "audio_file": audio_path,
+        "audio_file_id": file_id,
         "status": "uploaded"
     })
 

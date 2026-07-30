@@ -42,35 +42,52 @@ Page({
   },
 
   initAudio(data) {
-    if (!data.audio_file) {
+    if (!data.audio_file && !data.audio_file_id) {
       this.setData({ hasAudio: false });
       return;
     }
-    const app = getApp();
-    const base = app.globalData.apiBaseUrl || 'http://localhost:8000';
-    const url = `${base}/api/recordings/${this.data.recordingId}/audio`;
-    const ctx = this.audioCtx;
-    if (ctx) {
-      ctx.destroy();
-    }
-    const audio = wx.createInnerAudioContext();
-    audio.src = url;
-    audio.onPlay(() => this.setData({ isPlaying: true }));
-    audio.onPause(() => this.setData({ isPlaying: false }));
-    audio.onStop(() => this.setData({ isPlaying: false }));
-    audio.onEnded(() => this.setData({ isPlaying: false, audioCurrent: 0 }));
-    audio.onTimeUpdate(() => {
-      this.setData({
-        audioCurrent: Math.floor(audio.currentTime || 0),
-        audioDuration: Math.floor(audio.duration || 0),
+
+    const setupAudio = (url) => {
+      const ctx = this.audioCtx;
+      if (ctx) {
+        ctx.destroy();
+      }
+      const audio = wx.createInnerAudioContext();
+      audio.src = url;
+      audio.onPlay(() => this.setData({ isPlaying: true }));
+      audio.onPause(() => this.setData({ isPlaying: false }));
+      audio.onStop(() => this.setData({ isPlaying: false }));
+      audio.onEnded(() => this.setData({ isPlaying: false, audioCurrent: 0 }));
+      audio.onTimeUpdate(() => {
+        this.setData({
+          audioCurrent: Math.floor(audio.currentTime || 0),
+          audioDuration: Math.floor(audio.duration || 0),
+        });
       });
-    });
-    audio.onError((e) => {
-      console.error('音频播放失败', e);
-      wx.showToast({ title: '音频播放失败', icon: 'none' });
-    });
-    this.audioCtx = audio;
-    this.setData({ hasAudio: true, audioUrl: url, audioCurrent: 0, audioDuration: 0 });
+      audio.onError((e) => {
+        console.error('音频播放失败', e);
+        wx.showToast({ title: '音频播放失败', icon: 'none' });
+      });
+      this.audioCtx = audio;
+      this.setData({ hasAudio: true, audioUrl: url, audioCurrent: 0, audioDuration: 0 });
+    };
+
+    if (data.audio_file_id) {
+      wx.cloud.getTempFileURL({
+        fileList: [data.audio_file_id],
+        success: (res) => setupAudio(res.fileList[0].tempFileURL),
+        fail: () => {
+          // 回退到后端音频接口（本地调试或旧数据）
+          const app = getApp();
+          const base = app.globalData.apiBaseUrl || 'http://localhost:8000';
+          setupAudio(`${base}/api/recordings/${this.data.recordingId}/audio`);
+        },
+      });
+    } else {
+      const app = getApp();
+      const base = app.globalData.apiBaseUrl || 'http://localhost:8000';
+      setupAudio(`${base}/api/recordings/${this.data.recordingId}/audio`);
+    }
   },
 
   togglePlay() {
