@@ -1,7 +1,6 @@
 """会议记录CRUD路由"""
-import base64
 import os
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse
 
 from services.storage import (
@@ -53,8 +52,8 @@ async def api_delete_recording(recording_id: str):
 
 
 @router.post("/api/recordings/{recording_id}/upload")
-async def api_upload_audio(recording_id: str, data: dict, ext: str = ".wav"):
-    """上传音频文件（接收 JSON 里的 base64 音频，兼容 wx.cloud.callContainer）"""
+async def api_upload_audio(recording_id: str, request: Request, ext: str = ".aac"):
+    """上传音频文件（接收二进制流，兼容 wx.cloud.callContainer 和 wx.request）"""
     rec = get_recording(recording_id)
     if not rec:
         raise HTTPException(status_code=404, detail="会议记录不存在")
@@ -64,17 +63,12 @@ async def api_upload_audio(recording_id: str, data: dict, ext: str = ".wav"):
     ext = ext.strip().lower()
     if not ext.startswith("."):
         ext = "." + ext
-    ext = "".join(c for c in ext if c.isalnum() or c == ".") or ".wav"
+    ext = "".join(c for c in ext if c.isalnum() or c == ".") or ".aac"
     audio_path = os.path.join(AUDIO_DIR, f"{recording_id}{ext}")
 
-    audio_b64 = data.get("audio", "")
-    if not audio_b64:
+    content = await request.body()
+    if not content:
         raise HTTPException(status_code=400, detail="缺少音频数据")
-
-    try:
-        content = base64.b64decode(audio_b64)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"音频数据解码失败: {e}")
 
     with open(audio_path, "wb") as f:
         f.write(content)
@@ -96,4 +90,12 @@ async def api_get_audio(recording_id: str):
     audio_file = rec.get("audio_file", "")
     if not audio_file or not os.path.exists(audio_file):
         raise HTTPException(status_code=404, detail="音频文件不存在")
-    return FileResponse(audio_file, media_type="audio/wav")
+    ext = os.path.splitext(audio_file)[1].lower()
+    media_type = {
+        '.aac': 'audio/aac',
+        '.mp3': 'audio/mpeg',
+        '.m4a': 'audio/mp4',
+        '.wav': 'audio/wav',
+        '.ogg': 'audio/ogg',
+    }.get(ext, 'application/octet-stream')
+    return FileResponse(audio_file, media_type=media_type)

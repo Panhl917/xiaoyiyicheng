@@ -33,7 +33,7 @@ Page({
         this.setData({
           isRecording: false,
           tempFilePath: res.tempFilePath,
-          audioFileName: `录音_${this.formatDate(new Date())}.wav`,
+          audioFileName: `录音_${this.formatDate(new Date())}.aac`,
           canSubmit: true,
         });
         clearInterval(this.data.timer);
@@ -103,8 +103,8 @@ Page({
           duration: 600000, // 最多10分钟
           sampleRate: 16000,
           numberOfChannels: 1,
-          encodeBitRate: 48000,
-          format: 'wav',
+          encodeBitRate: 24000,
+          format: 'aac',
         });
       },
       fail: () => {

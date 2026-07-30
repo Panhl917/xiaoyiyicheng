@@ -67,25 +67,29 @@ const request = (path, method = 'GET', data = null, options = {}) => {
 };
 
 /**
- * 上传音频文件（以 base64 编码放在 JSON 里上传）
- * 兼容 wx.cloud.callContainer 和 wx.request，避免 ArrayBuffer 在 callContainer 里出现 offset out of bounds
+ * 上传音频文件（以 ArrayBuffer 二进制直传）
+ * 兼容 wx.cloud.callContainer 和 wx.request，不手动设置 Content-Type，避免序列化冲突
  */
 const uploadAudio = (id, filePath) => {
   return new Promise((resolve, reject) => {
     const fs = wx.getFileSystemManager();
     fs.readFile({
       filePath,
-      encoding: 'base64',
       success: (readRes) => {
-        const base64 = readRes.data;
+        const buffer = readRes.data;
+        if (!buffer || (buffer.byteLength !== undefined && buffer.byteLength === 0)) {
+          reject(new Error('音频文件为空'));
+          return;
+        }
+
         const extMatch = filePath.match(/\.([a-zA-Z0-9]+)$/);
-        const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.wav';
+        const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.aac';
 
         request(
           `/api/recordings/${id}/upload?ext=${encodeURIComponent(ext)}`,
           'POST',
-          { audio: base64 },
-          { header: { 'Content-Type': 'application/json' } }
+          buffer,
+          { dataType: 'json' }
         )
           .then(resolve)
           .catch(reject);
