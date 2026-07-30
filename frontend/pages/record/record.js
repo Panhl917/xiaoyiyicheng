@@ -212,7 +212,7 @@ Page({
   // 轮询记录状态直到达到目标状态
   pollStatus(recId, targetStatus, label) {
     return new Promise((resolve, reject) => {
-      const maxTries = 120; // 最多约 6 分钟（长录音可能更久）
+      const maxTries = 600; // 最多约 30 分钟（1小时长录音转写较慢）
       let tries = 0;
       const poll = () => {
         tries += 1;

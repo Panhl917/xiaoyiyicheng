@@ -179,7 +179,7 @@ Page({
   // 轮询记录状态直到达到目标状态
   pollStatus(targetStatus, label) {
     return new Promise((resolve, reject) => {
-      const maxTries = 120;
+      const maxTries = 600;
       let tries = 0;
       const poll = () => {
         tries += 1;
