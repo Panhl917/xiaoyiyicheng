@@ -174,23 +174,25 @@ Page({
     api.createRecording(this.data.title)
       .then((recording) => {
         const recId = recording.id;
-        this.updateProcess(2, 35, '处理音频...');
+        this.updateProcess(2, 35, '上传音频...');
 
-        // 2. 上传音频
+        // 2. 上传音频（云存储 + 后端下载，支持大文件）
         return api.uploadAudio(recId, this.data.tempFilePath).then(() => recId);
       })
       .then((recId) => {
-        this.updateProcess(3, 60, '识别文字...');
+        this.updateProcess(3, 50, '识别文字中（长录音较慢）...');
 
-        // 3. 语音转文字
+        // 3. 语音转文字（异步，轮询状态）
         return api.transcribe(recId).then(() => recId);
       })
+      .then((recId) => this.pollStatus(recId, 'transcribed', '识别文字'))
       .then((recId) => {
-        this.updateProcess(4, 85, '生成摘要...');
+        this.updateProcess(4, 80, '生成摘要中...');
 
-        // 4. 生成摘要
+        // 4. 生成摘要（异步，轮询状态）
         return api.summarize(recId).then(() => recId);
       })
+      .then((recId) => this.pollStatus(recId, 'summarized', '生成摘要'))
       .then((recId) => {
         this.updateProcess(4, 100, '处理完成！');
 
@@ -205,6 +207,32 @@ Page({
         this.setData({ processing: false });
         wx.showToast({ title: err.message || '处理失败', icon: 'none' });
       });
+  },
+
+  // 轮询记录状态直到达到目标状态
+  pollStatus(recId, targetStatus, label) {
+    return new Promise((resolve, reject) => {
+      const maxTries = 120; // 最多约 6 分钟（长录音可能更久）
+      let tries = 0;
+      const poll = () => {
+        tries += 1;
+        api.getRecording(recId)
+          .then((rec) => {
+            const status = rec.status;
+            if (status === targetStatus) {
+              resolve(recId);
+            } else if (status === 'failed') {
+              reject(new Error(`${label}失败：${rec.error || '未知错误'}`));
+            } else if (tries >= maxTries) {
+              reject(new Error(`${label}超时，请稍后在详情页重试`));
+            } else {
+              setTimeout(poll, 3000);
+            }
+          })
+          .catch(reject);
+      };
+      poll();
+    });
   },
 
   updateProcess(step, percent, text) {

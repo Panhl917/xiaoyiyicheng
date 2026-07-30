@@ -176,18 +176,45 @@ Page({
       });
   },
 
+  // 轮询记录状态直到达到目标状态
+  pollStatus(targetStatus, label) {
+    return new Promise((resolve, reject) => {
+      const maxTries = 120;
+      let tries = 0;
+      const poll = () => {
+        tries += 1;
+        api.getRecording(this.data.recordingId)
+          .then((rec) => {
+            const status = rec.status;
+            if (status === targetStatus) {
+              resolve();
+            } else if (status === 'failed') {
+              reject(new Error(`${label}失败：${rec.error || '未知错误'}`));
+            } else if (tries >= maxTries) {
+              reject(new Error(`${label}超时，请稍后重试`));
+            } else {
+              setTimeout(poll, 3000);
+            }
+          })
+          .catch(reject);
+      };
+      poll();
+    });
+  },
+
   // 语音转文字
   processTranscribe() {
-    wx.showLoading({ title: '转写中...', mask: true });
+    wx.showLoading({ title: '转写中（长录音较慢）...', mask: true });
     api.transcribe(this.data.recordingId)
-      .then((data) => {
+      .then(() => this.pollStatus('transcribed', '转写'))
+      .then(() => {
         wx.hideLoading();
         this.loadDetail();
         wx.showToast({ title: '转写完成', icon: 'success' });
       })
       .catch((err) => {
         wx.hideLoading();
-        wx.showToast({ title: '转写失败', icon: 'none' });
+        wx.showToast({ title: err.message || '转写失败', icon: 'none' });
       });
   },
 
@@ -195,14 +222,15 @@ Page({
   processSummarize() {
     wx.showLoading({ title: '生成摘要中...', mask: true });
     api.summarize(this.data.recordingId)
-      .then((data) => {
+      .then(() => this.pollStatus('summarized', '摘要生成'))
+      .then(() => {
         wx.hideLoading();
         this.loadDetail();
         wx.showToast({ title: '摘要生成完成', icon: 'success' });
       })
       .catch((err) => {
         wx.hideLoading();
-        wx.showToast({ title: '生成失败', icon: 'none' });
+        wx.showToast({ title: err.message || '生成失败', icon: 'none' });
       });
   },
 
@@ -210,6 +238,7 @@ Page({
   processMindmap() {
     wx.showLoading({ title: '生成中...', mask: true });
     api.generateMindmap(this.data.recordingId)
+      .then(() => this.pollStatus('mindmap_ready', '思维导图生成'))
       .then(() => {
         wx.hideLoading();
         wx.navigateTo({
@@ -218,7 +247,7 @@ Page({
       })
       .catch((err) => {
         wx.hideLoading();
-        wx.showToast({ title: '生成失败', icon: 'none' });
+        wx.showToast({ title: err.message || '生成失败', icon: 'none' });
       });
   },
 
@@ -226,6 +255,7 @@ Page({
   processKnowledgeGraph() {
     wx.showLoading({ title: '生成中...', mask: true });
     api.generateKnowledgeGraph(this.data.recordingId)
+      .then(() => this.pollStatus('knowledge_ready', '知识图谱生成'))
       .then(() => {
         wx.hideLoading();
         wx.navigateTo({
@@ -234,7 +264,7 @@ Page({
       })
       .catch((err) => {
         wx.hideLoading();
-        wx.showToast({ title: '生成失败', icon: 'none' });
+        wx.showToast({ title: err.message || '生成失败', icon: 'none' });
       });
   },
 

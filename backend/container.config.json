@@ -2,7 +2,7 @@
   "containerPort": 8000,
   "cpu": 1,
   "mem": 2,
-  "minNum": 0,
+  "minNum": 1,
   "maxNum": 5,
   "concurrency": 1,
   "dockerfilePath": "Dockerfile",

@@ -1,4 +1,5 @@
-"""语音转文字路由 - 使用本地 faster-whisper"""
+"""语音转文字路由 - 使用本地 faster-whisper（异步处理，避免 15s 超时）"""
+import asyncio
 import os
 from fastapi import APIRouter, HTTPException
 
@@ -10,7 +11,7 @@ router = APIRouter()
 
 @router.post("/api/recordings/{recording_id}/transcribe")
 async def api_transcribe(recording_id: str):
-    """语音转文字（本地Whisper，免费）"""
+    """提交语音转文字任务（异步），前端轮询状态"""
     rec = get_recording(recording_id)
     if not rec:
         raise HTTPException(status_code=404, detail="会议记录不存在")
@@ -30,14 +31,16 @@ async def api_transcribe(recording_id: str):
             "transcript": mock_transcript,
             "status": "transcribed"
         })
-        return {"transcript": mock_transcript, "note": "未检测到音频文件，使用示例文字稿"}
+        return {"status": "transcribed", "note": "未检测到音频文件，使用示例文字稿"}
 
-    transcript = transcribe_audio(audio_path)
+    update_recording(recording_id, {"status": "transcribing"})
+    asyncio.create_task(_run_transcribe(recording_id, audio_path))
+    return {"status": "transcribing", "message": "转写任务已提交"}
+
+
+async def _run_transcribe(recording_id: str, audio_path: str):
+    transcript = await asyncio.to_thread(transcribe_audio, audio_path)
     if not transcript:
-        raise HTTPException(status_code=500, detail="语音转文字失败")
-
-    update_recording(recording_id, {
-        "transcript": transcript,
-        "status": "transcribed"
-    })
-    return {"transcript": transcript}
+        update_recording(recording_id, {"status": "failed", "error": "语音转文字失败"})
+        return
+    update_recording(recording_id, {"transcript": transcript, "status": "transcribed"})
